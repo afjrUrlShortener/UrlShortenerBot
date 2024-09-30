@@ -1,0 +1,16 @@
+services:
+  tunnel:
+    image: ngrok/ngrok:alpine
+    environment:
+      - NGROK_AUTHTOKEN=CHANGE_ME
+    command: http 3000 --log 'stdout'
+    network_mode: host
+
+  app:
+    container_name: url-shortener-bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "3000:3000"
