@@ -16,7 +16,7 @@ export class GitHubHttpFactory implements HttpModuleOptionsFactory {
   constructor(
     configService: ConfigService<IAppConfig>,
     @Inject(CACHE_MANAGER) cache: Cache,
-    jwtService: JwtService,
+    jwtService: JwtService
   ) {
     this._jwtService = jwtService;
     this._cache = cache;
@@ -31,7 +31,7 @@ export class GitHubHttpFactory implements HttpModuleOptionsFactory {
 
   async createHttpOptions(): Promise<HttpModuleOptions> {
     let installationAccessToken = await this._cache.get<string>(
-      'INSTALLATION_ACCESS_TOKEN',
+      'INSTALLATION_ACCESS_TOKEN'
     );
     if (!installationAccessToken) {
       const installationId = this._configService.get('gitHubAppInstallationId');
@@ -45,14 +45,14 @@ export class GitHubHttpFactory implements HttpModuleOptionsFactory {
             ...this._defaultHeader,
             Authorization: `Bearer ${rsaSignedToken}`,
           },
-        },
+        }
       );
 
       installationAccessToken = response.data.token;
       await this._cache.set(
         'INSTALLATION_ACCESS_TOKEN',
         installationAccessToken,
-        3_600_000,
+        3_600_000
       );
     }
 

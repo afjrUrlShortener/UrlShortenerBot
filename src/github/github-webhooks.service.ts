@@ -18,7 +18,7 @@ export class GitHubWebhooksService {
 
   async checkIssueComment(
     body: WebhookEvent,
-    comment: string,
+    comment: string
   ): Promise<boolean> {
     if (!('issue' in body)) return false;
     const owner = body.repository.owner.login;
@@ -26,7 +26,7 @@ export class GitHubWebhooksService {
     const issue = body.issue.id;
 
     const response = await this._httpService.axiosRef.get<{ body: string }[]>(
-      `repos/${owner}/${repository}/issues/${issue}/comments`,
+      `repos/${owner}/${repository}/issues/${issue}/comments`
     );
 
     const { status } = response;
@@ -35,7 +35,7 @@ export class GitHubWebhooksService {
       return false;
     }
 
-    return response.data.some((x) => x.body === comment);
+    return response.data.some(x => x.body === comment);
   }
 
   async createIssueComment(body: WebhookEvent, comment: string) {
@@ -46,7 +46,7 @@ export class GitHubWebhooksService {
 
     await this._httpService.axiosRef.post(
       `repos/${owner}/${repository}/issues/${issue}/comments`,
-      { body: comment },
+      { body: comment }
     );
   }
 
@@ -58,7 +58,7 @@ export class GitHubWebhooksService {
 
     await this._httpService.axiosRef.post(
       `repos/${owner}/${repository}/issues/${issue}/labels`,
-      { labels: labels },
+      { labels: labels }
     );
   }
 }

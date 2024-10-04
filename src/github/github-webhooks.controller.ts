@@ -14,7 +14,7 @@ export class GitHubWebhooksController {
   @Post()
   async handleGitHubEvent(
     @Headers('X-GitHub-Event') webhookEventName: WebhookEventName,
-    @Body() body: WebhookEvent,
+    @Body() body: WebhookEvent
   ) {
     //TODO: Implement logic for github app
     if (webhookEventName === 'issues' && 'action' in body && 'issue' in body) {
@@ -23,16 +23,16 @@ export class GitHubWebhooksController {
         case 'edited':
         case 'opened':
         case 'reopened':
-          const owner = body.repository.owner.login;
-          const repository = body.repository.name;
-          const issue = body.issue.id;
+          // const owner = body.repository.owner.login;
+          // const repository = body.repository.name;
+          // const issue = body.issue.id;
 
           const isTitleValid = this._gitHubHttpService.checkIssueTitle(body);
           // todo: check if contains bot comment
           if (!isTitleValid) {
-            this._gitHubHttpService.createIssueComment(
+            await this._gitHubHttpService.createIssueComment(
               body,
-              'Invalid title, please fix.',
+              'Invalid title, please fix.'
             );
           }
           break;

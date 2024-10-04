@@ -20,7 +20,7 @@ export function config(): IAppConfig {
     gitHubAppId: process.env.GITHUB_APP_ID || '',
     gitHubAppInstallationId: parseInt(
       process.env.GITHUB_APP_INSTALLATION_ID || '0',
-      10,
+      10
     ),
     gitHubPrivateKey: process.env.GITHUB_PRIVATE_KEY || '',
     gitHubAppSecret: process.env.GITHUB_APP_SECRET || '',
