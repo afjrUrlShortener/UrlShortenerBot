@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { LogLevel, VersioningType } from '@nestjs/common';
+import { Logger, LogLevel, VersioningType } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IAppConfig } from './app.config';
 
@@ -15,6 +15,8 @@ async function bootstrap() {
 
   const port = configuration.get<number>('port')!;
   await app.listen(port);
+  const logger = new Logger();
+  logger.log(`Application running at ${await app.getUrl()}`);
 }
 
 bootstrap().finally();
