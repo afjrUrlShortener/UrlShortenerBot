@@ -1,48 +1,36 @@
 import { Body, Controller, Post, Headers, Logger } from '@nestjs/common';
-import { WebhookEvent, WebhookEventName } from '@octokit/webhooks-types';
-import { GitHubWebhooksService } from './github-webhooks.service';
+import {
+  PullRequestEvent,
+  WebhookEvent,
+  WebhookEventName,
+} from '@octokit/webhooks-types';
+import { GithubPullRequestService } from './github-pull-request.service';
 
 @Controller({ version: '1', path: 'github/webhooks' })
 export class GitHubWebhooksController {
   private readonly _logger = new Logger();
-  private readonly _gitHubHttpService: GitHubWebhooksService;
+  private readonly _githubPullRequestService: GithubPullRequestService;
 
-  constructor(gitHubHttpService: GitHubWebhooksService) {
-    this._gitHubHttpService = gitHubHttpService;
+  constructor(githubPullRequestService: GithubPullRequestService) {
+    this._githubPullRequestService = githubPullRequestService;
   }
 
   @Post()
-  async handleGitHubEvent(
+  async handleEvent(
     @Headers('X-GitHub-Event') webhookEventName: WebhookEventName,
-    @Body() body: WebhookEvent
+    @Body() eventBody: WebhookEvent
   ) {
-    //TODO: Implement logic for github app
-    if (webhookEventName === 'issues' && 'action' in body && 'issue' in body) {
-      switch (body.action) {
-        case 'created':
-        case 'edited':
-        case 'opened':
-        case 'reopened':
-          // const owner = body.repository.owner.login;
-          // const repository = body.repository.name;
-          // const issue = body.issue.id;
+    if (webhookEventName === 'pull_request') {
+      const body = eventBody as PullRequestEvent;
+      const unhandledAction = await this._githubPullRequestService.handleEvent(
+        body,
+        ['created', 'edited', 'opened', 'reopened']
+      );
 
-          const isTitleValid = this._gitHubHttpService.checkIssueTitle(body);
-          // todo: check if contains bot comment
-          if (!isTitleValid) {
-            await this._gitHubHttpService.createIssueComment(
-              body,
-              'Invalid title, please fix.'
-            );
-          }
-          break;
-
-        default:
-          this._logger.debug(`Unhandled action: ${body.action}`);
-          break;
-      }
-    } else {
-      this._logger.debug(`Unhandled event: ${webhookEventName}`);
+      if (!unhandledAction) return;
+      this._logger.debug(`Unhandled action: ${unhandledAction}`);
     }
+
+    this._logger.debug(`Unhandled event: ${webhookEventName}`);
   }
 }
